@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Stats Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .stats {
+            display: none; /* Initially hide the stats */
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .stat {
+            margin: 0 20px;
+        }
+        .stat h2 {
+            margin-bottom: 10px;
+        }
+        .stat p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .error-message {
+            color: red;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .user-avatar {
+            display: none; /* Initially hide the avatar */
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        .viewing-text {
+            display: none; /* Initially hide the "Currently viewing" text */
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Stats Tracker</h1>
+        <div class="input-container">
+            <input type="text" id="usernameInput" placeholder="Enter your GitHub username">
+            <button onclick="fetchGitHubStats()">Track</button>
+        </div>
+        <img src="" alt="User Avatar" class="user-avatar" id="userAvatar">
+        <p class="viewing-text" id="viewingText">Currently viewing:</p>
+        <div class="stats" id="statsContainer">
+            <div class="stat">
+                <h2>Repositories</h2>
+                <p id="repoCount">-</p>
+            </div>
+            <div class="stat">
+                <h2>Followers</h2>
+                <p id="followerCount">-</p>
+            </div>
+            <div class="stat">
+                <h2>Following</h2>
+                <p id="followingCount">-</p>
+            </div>
+        </div>
+        <p id="errorMessage" class="error-message"></p>
+    </div>
+
+    <script>
+        function fetchGitHubStats() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const apiUrl = `https://api.github.com/users/${username}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('User not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('repoCount').textContent = data.public_repos;
+                    document.getElementById('followerCount').textContent = data.followers;
+                    document.getElementById('followingCount').textContent = data.following;
+                    document.getElementById('errorMessage').textContent = '';
+                    document.getElementById('userAvatar').src = data.avatar_url;
+                    document.getElementById('viewingText').textContent = `Currently viewing: ${data.login}`;
+                    document.getElementById('statsContainer').style.display = 'flex'; // Show the stats container
+                    document.getElementById('userAvatar').style.display = 'block'; // Show the avatar
+                    document.getElementById('viewingText').style.display = 'block'; // Show the "Currently viewing" text
+                })
+                .catch(error => {
+                    console.error('Error fetching GitHub data:', error);
+                    document.getElementById('repoCount').textContent = '-';
+                    document.getElementById('followerCount').textContent = '-';
+                    document.getElementById('followingCount').textContent = '-';
+                    document.getElementById('errorMessage').textContent = error.message;
+                    document.getElementById('userAvatar').src = '';
+                    document.getElementById('viewingText').textContent = 'Currently viewing:';
+                    document.getElementById('statsContainer').style.display = 'none'; // Hide the stats container
+                    document.getElementById('userAvatar').style.display = 'none'; // Hide the avatar
+                    document.getElementById('viewingText').style.display = 'none'; // Hide the "Currently viewing" text
+                });
+        }
+    </script>
+</body>
+</html>
